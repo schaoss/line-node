@@ -15,7 +15,13 @@ bot.on('message', e => {
   if (e.message.type === 'text') {
     const msg = e.message.text
     if (msg.includes('福利') && imgArr[0]) {
-      let rtnObj = imgArr[Math.floor(Math.random() * imgArr.length) + 1]
+      let rtnObj = [
+        randomImage(),
+        randomImage(),
+        randomImage(),
+        randomImage(),
+        randomImage(),
+      ]
       e
         .reply(rtnObj)
         .then(data => {
@@ -28,28 +34,26 @@ bot.on('message', e => {
   }
 })
 
-const randomImage = () => {
-  setInterval(
-    () => {
-      imgArr = []
-      getJSON(
-        'http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20',
-        (error, response) => {
-          response.results.forEach(e => {
-            let imgUrl = e.url.includes('https')
-              ? e.url
-              : e.url.replace('http', 'https')
-            imgArr.push({
-              type: 'image',
-              originalContentUrl: imgUrl,
-              previewImageUrl: imgUrl,
-            })
+const randomImage = () => imgArr[Math.floor(Math.random() * imgArr.length) + 1]
+
+const getImageJson = () => {
+  for (let i = 0; i < 5; i++) {
+    getJSON(
+      'http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20',
+      (error, response) => {
+        response.results.forEach(e => {
+          let imgUrl = e.url.includes('https')
+            ? e.url
+            : e.url.replace('http', 'https')
+          imgArr.push({
+            type: 'image',
+            originalContentUrl: imgUrl,
+            previewImageUrl: imgUrl,
           })
-        }
-      )
-    },
-    60 * 1000 //1分鐘重取一次
-  )
+        })
+      }
+    )
+  }
 }
 
 const app = express()
@@ -60,5 +64,5 @@ app.post('/', linebotParser)
 const server = app.listen(process.env.PORT || 8080, function() {
   const port = server.address().port
   console.log('App now running on port', port)
-  randomImage()
+  getImageJson()
 })
