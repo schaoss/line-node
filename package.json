@@ -2,14 +2,20 @@
   "name": "line-node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel src -d dist",
+    "start": "babel src -d dist && node ./dist/app.js"
   },
   "author": "gary.chu",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.3",
+    "get-json": "^1.0.0",
     "linebot": "^1.4.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1"
   }
 }
