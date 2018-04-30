@@ -56,7 +56,7 @@ const randomImage = () => imgArr[Math.floor(Math.random() * imgArr.length) + 1]
 
 const queryYoutubeVideo = qryStr => {
   return fetch(
-    `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=viewCount&q=${encodeURI(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&order=viewCount&q=${encodeURI(
       qryStr
     )}&key=${googleApiKey}`,
     { method: 'get' }
