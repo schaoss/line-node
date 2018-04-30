@@ -1,12 +1,15 @@
 import linebot from 'linebot'
 import express from 'express'
-import getJSON from 'get-json'
+import fetch from 'isomorphic-fetch'
+
+const googleApiKey = process.env.GoogleApiKey
 
 const bot = linebot({
-  channelId: '1577421285',
-  channelSecret: process.env.ChannelSecret, //heroku's config var
+  channelId: process.env.ChannelId, //heroku's config var
+  channelSecret: process.env.ChannelSecret,
   channelAccessToken: process.env.ChannelAccessToken,
 })
+
 let imgArr = []
 
 bot.on('message', e => {
@@ -14,7 +17,27 @@ bot.on('message', e => {
 
   if (e.message.type === 'text') {
     const msg = e.message.text
-    if (msg.includes('福利') && imgArr[0]) {
+
+    if (msg.indexOf('!') === 0) {
+      //call youtube api
+      const qryStr = msg
+        .substr(1, msg.length - 1)
+        .replace(/[ `~!@#$%^&*()\-_=+[{\]};:'"\\\/?.>,<]/g, '+')
+      let videoUrl = ''
+
+      queryYoutubeVideo(qryStr)
+        .then(tmp => (videoUrl = tmp))
+        .then(() =>
+          e.reply(videoUrl).catch(error => {
+            console.log('error')
+          })
+        )
+      console.log(videoUrl)
+
+      e.reply(videoUrl).catch(error => {
+        console.log('error')
+      })
+    } else if (msg.includes('福利') && imgArr[0]) {
       let rtnObj = [
         randomImage(),
         randomImage(),
@@ -22,37 +45,57 @@ bot.on('message', e => {
         randomImage(),
         randomImage(),
       ]
-      e
-        .reply(rtnObj)
-        .then(data => {
-          //console.log(msg)
-        })
-        .catch(error => {
-          console.log('error')
-        })
+      e.reply(rtnObj).catch(error => {
+        console.log('error')
+      })
     }
   }
 })
 
 const randomImage = () => imgArr[Math.floor(Math.random() * imgArr.length) + 1]
 
+const queryYoutubeVideo = qryStr => {
+  return fetch(
+    `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=viewCount&q=${encodeURI(
+      qryStr
+    )}&key=${googleApiKey}`,
+    { method: 'get' }
+  )
+    .then(response => response.json())
+    .then(json => {
+      return `${json.items[0].snippet.title}  https://www.youtube.com/watch?v=${
+        json.items[0].id.videoId
+      }`
+    })
+    .catch(err => {
+      console.log('error')
+    })
+}
+
 const getImageJson = () => {
-  for (let i = 0; i < 5; i++) {
-    getJSON(
-      'http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20',
-      (error, response) => {
-        response.results.forEach(e => {
-          let imgUrl = e.url.includes('https')
-            ? e.url
-            : e.url.replace('http', 'https')
-          imgArr.push({
-            type: 'image',
-            originalContentUrl: imgUrl,
-            previewImageUrl: imgUrl,
-          })
+  for (let i = 0; i < 8; i++) {
+    fetch('http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20', {
+      method: 'get',
+    })
+      .then(response => response.json())
+      .then(json => {
+        json.results.forEach(e => {
+          if (e.url.includes('.jpg') || e.url.includes('.jpeg')) {
+            //Line 只支援jpg
+            let imgUrl = e.url.includes('https')
+              ? e.url
+              : e.url.replace('http', 'https')
+            imgArr.push({
+              type: 'image',
+              originalContentUrl: imgUrl,
+              previewImageUrl: imgUrl,
+            })
+          }
         })
-      }
-    )
+      })
+      .catch(err => {
+        console.log('error')
+      })
   }
 }
 
