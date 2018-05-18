@@ -18,7 +18,7 @@ bot.on('message', e => {
   if (e.message.type === 'text') {
     const msg = e.message.text
 
-    if (msg.indexOf('!') === 0) {
+    if (msg.indexOf('!') === 0 || msg.indexOf('！') === 0) {
       //call youtube api
       const qryStr = msg
         .substr(1, msg.length - 1)
