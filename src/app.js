@@ -7,7 +7,7 @@ const googleApiKey = process.env.GoogleApiKey
 const bot = linebot({
   channelId: process.env.ChannelId, //heroku's config var
   channelSecret: process.env.ChannelSecret,
-  channelAccessToken: process.env.ChannelAccessToken,
+  channelAccessToken: process.env.ChannelAccessToken
 })
 
 let imgArr = []
@@ -43,7 +43,7 @@ bot.on('message', e => {
         randomImage(),
         randomImage(),
         randomImage(),
-        randomImage(),
+        randomImage()
       ]
       e.reply(rtnObj).catch(error => {
         console.log('error')
@@ -73,9 +73,10 @@ const queryYoutubeVideo = qryStr => {
 }
 
 const getImageJson = () => {
+  imgArr = []
   for (let i = 0; i < 8; i++) {
     fetch('http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20', {
-      method: 'get',
+      method: 'get'
     })
       .then(response => response.json())
       .then(json => {
@@ -88,7 +89,7 @@ const getImageJson = () => {
             imgArr.push({
               type: 'image',
               originalContentUrl: imgUrl,
-              previewImageUrl: imgUrl,
+              previewImageUrl: imgUrl
             })
           }
         })
@@ -101,6 +102,15 @@ const getImageJson = () => {
 
 const app = express()
 const linebotParser = bot.parser()
+app.get('/new', () => {
+  getImageJson()
+})
+app.get('/', (req, res) => [
+  res.send({
+    status: 200,
+    data: imgArr
+  })
+])
 app.post('/', linebotParser)
 
 //因為 express 預設走 port 3000，而 heroku 上預設卻不是，要透過下列程式轉換
