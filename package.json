@@ -5,16 +5,20 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "babel src -d dist",
-    "start": "babel src -d dist && node ./dist/app.js"
+    "start": "babel src -d dist && node ./dist/app.js",
+    "download": "babel src -d dist && node ./dist/download.js"
   },
   "author": "gary.chu",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3",
-    "isomorphic-fetch": "^2.2.1",
-    "linebot": "^1.4.1",
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.7.0",
+    "express": "^4.16.4",
+    "node-fetch": "^2.3.0",
+    "linebot": "^1.4.1",
+    "mkdirp": "^0.5.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0"
+  }
 }

@@ -1,6 +1,6 @@
 import linebot from 'linebot'
 import express from 'express'
-import fetch from 'isomorphic-fetch'
+import fetch from 'node-fetch'
 
 const googleApiKey = process.env.GoogleApiKey
 
@@ -74,30 +74,28 @@ const queryYoutubeVideo = qryStr => {
 
 const getImageJson = () => {
   imgArr = []
-  for (let i = 0; i < 8; i++) {
-    fetch('http://gank.io/api/random/data/%E7%A6%8F%E5%88%A9/20', {
-      method: 'get'
+  fetch('https://gank.io/api/data/%E7%A6%8F%E5%88%A9/2000/1', {
+    method: 'get'
+  })
+    .then(response => response.json())
+    .then(json => {
+      json.results.forEach(e => {
+        if (e.url.includes('.jpg') || e.url.includes('.jpeg')) {
+          //Line 只支援jpg
+          let imgUrl = e.url.includes('https')
+            ? e.url
+            : e.url.replace('http', 'https')
+          imgArr.push({
+            type: 'image',
+            originalContentUrl: imgUrl,
+            previewImageUrl: imgUrl
+          })
+        }
+      })
     })
-      .then(response => response.json())
-      .then(json => {
-        json.results.forEach(e => {
-          if (e.url.includes('.jpg') || e.url.includes('.jpeg')) {
-            //Line 只支援jpg
-            let imgUrl = e.url.includes('https')
-              ? e.url
-              : e.url.replace('http', 'https')
-            imgArr.push({
-              type: 'image',
-              originalContentUrl: imgUrl,
-              previewImageUrl: imgUrl
-            })
-          }
-        })
-      })
-      .catch(err => {
-        console.log('error')
-      })
-  }
+    .catch(err => {
+      console.log('error >>>', err)
+    })
 }
 
 const app = express()
