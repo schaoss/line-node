@@ -13,7 +13,7 @@ const bot = linebot({
 let imgArr = []
 
 bot.on('message', e => {
-  //console.log(e) //把收到訊息的 event 印出來看看
+  console.log(e) //把收到訊息的 event 印出來看看
 
   if (e.message.type === 'text') {
     const msg = e.message.text
