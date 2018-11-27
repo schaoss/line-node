@@ -14,6 +14,9 @@ let imgArr = []
 
 bot.on('message', e => {
   console.log(e) //把收到訊息的 event 印出來看看
+  console.log(e.source.profile())
+  console.log(e.source.member())
+  console.log(e.message.content())
 
   if (e.message.type === 'text') {
     const msg = e.message.text
